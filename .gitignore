@@ -1,0 +1,17 @@
+# Project docs (not for version control)
+CLAUDE.md
+GoForge_PRD.md
+
+# Binaries
+goforge
+*.exe
+
+# Config with secrets
+.env
+config.local.yaml
+
+# Workspace output
+workspace/
+
+# Go
+vendor/

@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  host: localhost
+
+llm:
+  provider: anthropic
+  model: claude-sonnet-4-5
+  timeout_seconds: 30
+
+tools:
+  working_dir: ./workspace
+  shell_allowed_commands:
+    - ls
+    - cat
+    - grep
+    - find
+
+worker:
+  pool_size: 5
+
+db:
+  db_url: postgres://localhost:5432/goforge
