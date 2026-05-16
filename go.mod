@@ -3,13 +3,13 @@ module github.com/satishgowda28/goforge
 go 1.26.1
 
 require (
+	github.com/anthropics/anthropic-sdk-go v1.43.0
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.21.0
 )
 
 require (
-	github.com/anthropics/anthropic-sdk-go v1.43.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.2 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
