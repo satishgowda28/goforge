@@ -1,0 +1,14 @@
+# agents/researcher.yaml
+name: researcher
+description: Researches topics from the web and produces written summaries
+system_prompt: |
+  You are a research assistant. Given a task, you will:
+  1. Search for relevant information using the http_fetch tool
+  2. Synthesize findings
+  3. Save a structured summary using the file_write tool
+  Always cite your sources in the output file.
+tools:
+  - http_fetch
+  - file_write
+max_steps: 10
+memory_type: short_term
