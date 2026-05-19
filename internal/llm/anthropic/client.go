@@ -2,6 +2,7 @@ package anthropic
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -33,7 +34,14 @@ func (c *Client) Complete(ctx context.Context, req llm.CompletionRequest) (llm.C
 	for _, msg := range req.Messages {
 		var blocks []anthropic.ContentBlockParamUnion
 		for _, block := range msg.Content {
-			blocks = append(blocks, anthropic.NewTextBlock(block.Text))
+			switch block.Type {
+			case "text":
+				blocks = append(blocks, anthropic.NewTextBlock(block.Text))
+			case "tool_use":
+				blocks = append(blocks, anthropic.NewToolUseBlock(block.ID, block.Input, block.Name))
+			case "tool_result":
+				blocks = append(blocks, anthropic.NewToolResultBlock(block.ToolUseID, block.Content, false))
+			}
 		}
 		switch msg.Role {
 		case "user":
@@ -42,12 +50,33 @@ func (c *Client) Complete(ctx context.Context, req llm.CompletionRequest) (llm.C
 			messages = append(messages, anthropic.NewAssistantMessage(blocks...))
 		}
 	}
+
+	var tools []anthropic.ToolUnionParam
+	for _, tool := range req.Tools {
+		var required []string
+		for key := range tool.InputSchema {
+			required = append(required, key)
+		}
+		t := anthropic.ToolUnionParam{
+			OfTool: &anthropic.ToolParam{
+				Name:        tool.Name,
+				Description: anthropic.String(tool.Description),
+				InputSchema: anthropic.ToolInputSchemaParam{
+					Properties: tool.InputSchema,
+					Required:   required,
+				},
+			},
+		}
+		tools = append(tools, t)
+	}
+
 	message, err := c.client.Messages.New(ctx, anthropic.MessageNewParams{
 		MaxTokens: int64(req.MaxTokens),
 		System: []anthropic.TextBlockParam{
 			{Text: req.SystemPrompt},
 		},
 		Messages: messages,
+		Tools:    tools,
 		Model:    c.model,
 	})
 	if err != nil {
@@ -55,10 +84,26 @@ func (c *Client) Complete(ctx context.Context, req llm.CompletionRequest) (llm.C
 	}
 	var block []llm.ContentBlock
 	for _, b := range message.Content {
-		block = append(block, llm.ContentBlock{
-			Type: b.Type,
-			Text: b.AsText().Text,
-		})
+		switch b.Type {
+		case "text":
+			block = append(block, llm.ContentBlock{
+				Type: b.Type,
+				Text: b.AsText().Text,
+			})
+		case "tool_use":
+			t := b.AsToolUse()
+			var io map[string]any
+			if err := json.Unmarshal(t.Input, &io); err != nil {
+				return llm.CompletionResponse{}, fmt.Errorf("%w", err)
+			}
+			block = append(block, llm.ContentBlock{
+				Type:  string(t.Type),
+				ID:    t.ID,
+				Name:  t.Name,
+				Input: io,
+			})
+		}
+
 	}
 	return llm.CompletionResponse{
 		Content:    block,

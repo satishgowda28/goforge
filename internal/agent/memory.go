@@ -7,10 +7,12 @@ type Memory interface {
 }
 
 type Step struct {
-	Type     string
-	ToolName string
-	Input    string
-	Output   string
+	Type      string
+	Thought   string // LLM reasoning text
+	ToolName  string
+	ToolUseID string
+	Input     string
+	Output    string
 }
 
 type ShortTermMemory struct {

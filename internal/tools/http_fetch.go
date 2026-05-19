@@ -15,7 +15,7 @@ func (t *HttpFetch) Name() string {
 }
 
 func (t *HttpFetch) Description() string {
-	return "Description of the tool"
+	return "Make a get request to get an appropriate data"
 }
 
 func (t *HttpFetch) Execute(ctx context.Context, input string) (string, error) {
@@ -48,6 +48,15 @@ func (t *HttpFetch) Execute(ctx context.Context, input string) (string, error) {
 	}
 
 	return string(body), nil
+}
+func (t *HttpFetch) InputSchema() map[string]any {
+	schema := make(map[string]any)
+	schema["url"] = map[string]any{
+		"type":        "string",
+		"description": "This is the URL used to make get request",
+	}
+
+	return schema
 }
 
 var _ Tool = &HttpFetch{}

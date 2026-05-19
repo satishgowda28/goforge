@@ -18,7 +18,7 @@ func (t *ShellExec) Name() string {
 }
 
 func (t *ShellExec) Description() string {
-	return "Description of the tool"
+	return "Executes a shell command on the local machine."
 }
 
 func (t *ShellExec) Execute(ctx context.Context, input string) (string, error) {
@@ -49,6 +49,20 @@ func (t *ShellExec) Execute(ctx context.Context, input string) (string, error) {
 	}
 
 	return stdOut.String(), nil
+}
+
+func (t *ShellExec) InputSchema() map[string]any {
+	schema := make(map[string]any)
+	schema["command"] = map[string]any{
+		"type":        "string",
+		"description": "The base command to run (e.g., 'git', 'ls', 'curl'). Do NOT include arguments here.",
+	}
+	schema["args"] = map[string]any{
+		"type":        "array",
+		"item":        map[string]any{"type": "string"},
+		"description": "The list of arguments to pass to the command.",
+	}
+	return schema
 }
 
 var _ Tool = &ShellExec{}

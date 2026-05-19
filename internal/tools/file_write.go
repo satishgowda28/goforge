@@ -14,7 +14,7 @@ func (t *FileWrite) Name() string {
 }
 
 func (t *FileWrite) Description() string {
-	return "Description of the tool"
+	return "Write the content to the file"
 }
 
 func (t *FileWrite) Execute(ctx context.Context, input string) (string, error) {
@@ -34,6 +34,19 @@ func (t *FileWrite) Execute(ctx context.Context, input string) (string, error) {
 	}
 
 	return string("Success"), nil
+}
+func (t *FileWrite) InputSchema() map[string]any {
+	schema := make(map[string]any)
+	schema["path"] = map[string]any{
+		"type":        "string",
+		"description": "This is the path to the file where the file is located. Do not include file content here",
+	}
+	schema["content"] = map[string]any{
+		"type":        "string",
+		"description": "This is the content of the file that need to be written and saved",
+	}
+
+	return schema
 }
 
 var _ Tool = &FileWrite{}

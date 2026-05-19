@@ -14,7 +14,7 @@ func (t *FileRead) Name() string {
 }
 
 func (t *FileRead) Description() string {
-	return "Description of the tool"
+	return "This is used to read the content of the file"
 }
 
 func (t *FileRead) Execute(ctx context.Context, input string) (string, error) {
@@ -33,6 +33,16 @@ func (t *FileRead) Execute(ctx context.Context, input string) (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func (t *FileRead) InputSchema() map[string]any {
+	schema := make(map[string]any)
+	schema["path"] = map[string]any{
+		"type":        "string",
+		"description": "This is the path to the file where the file is located.",
+	}
+
+	return schema
 }
 
 var _ Tool = &FileRead{}
