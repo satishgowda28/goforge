@@ -1,11 +1,5 @@
 package agent
 
-type Memory interface {
-	Add(step Step)
-	Recent(n int) []Step
-	Clear()
-}
-
 type Step struct {
 	Type      string
 	Thought   string // LLM reasoning text
@@ -14,7 +8,11 @@ type Step struct {
 	Input     string
 	Output    string
 }
-
+type Memory interface {
+	Add(step Step)
+	Recent(n int) []Step
+	Clear()
+}
 type ShortTermMemory struct {
 	steps []Step
 }
@@ -32,3 +30,5 @@ func (m *ShortTermMemory) Recent(n int) []Step {
 func (m *ShortTermMemory) Clear() {
 	m.steps = m.steps[:0]
 }
+
+var _ Memory = &ShortTermMemory{}

@@ -42,7 +42,9 @@ func (t *HttpFetch) Execute(ctx context.Context, input string) (string, error) {
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("failed response tool:%s, url: %s", toolName, ioArg.URL)
 	}
-	body, err := io.ReadAll(resp.Body)
+	// body, err := io.ReadAll(resp.Body)
+	limited := io.LimitReader(resp.Body, 8000)
+	body, err := io.ReadAll(limited)
 	if err != nil {
 		return "", fmt.Errorf("error in reading resp tool:%s, url: %s, error: %w", toolName, ioArg.URL, err)
 	}

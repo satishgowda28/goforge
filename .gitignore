@@ -3,7 +3,7 @@ CLAUDE.md
 GoForge_PRD.md
 
 # Binaries
-goforge
+/goforge
 *.exe
 
 # Config with secrets

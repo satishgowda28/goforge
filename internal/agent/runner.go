@@ -38,6 +38,7 @@ func NewRunner(llm llm.LLMProvider, tools *tools.Registry, memory Memory, config
 
 func (r *Runner) Run(ctx context.Context, task string) (RunResult, error) {
 
+	fmt.Print("Runner")
 	maxStep := r.Config.MaxSteps
 	if maxStep == 0 {
 		maxStep = 10
@@ -66,11 +67,16 @@ func (r *Runner) Run(ctx context.Context, task string) (RunResult, error) {
 	}
 	prompt.Tools = allTools
 
+	stepCount := 0
 	for range maxStep {
+		fmt.Printf("\nRunner %d", stepCount)
 		res, err := r.LLM.Complete(ctx, prompt)
 		if err != nil {
 			return RunResult{}, fmt.Errorf("%w", err)
 		}
+		prettyJSON, _ := json.MarshalIndent(res, "", "    ")
+		fmt.Println(string(prettyJSON))
+		fmt.Printf("\nrevied the response %d", stepCount)
 		// this is specific to anthorpic we need to make global
 		if res.StopReason == "tool_use" {
 			assistantMsg := llm.Message{
@@ -131,6 +137,10 @@ func (r *Runner) Run(ctx context.Context, task string) (RunResult, error) {
 				}
 			}
 		}
+		prettyJSON, _ = json.MarshalIndent(prompt.Messages, "", "    ")
+		fmt.Println(string(prettyJSON))
+
+		stepCount++
 
 	}
 	return RunResult{}, fmt.Errorf("Max step exceded")
